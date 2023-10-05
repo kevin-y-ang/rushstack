@@ -1,18 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import { analyze } from '@typescript-eslint/scope-manager';
-import { parse } from '@typescript-eslint/typescript-estree';
+import { Scope, ScopeType } from '@typescript-eslint/scope-manager';
 import { /* AST_NODE_TYPES, ASTUtils, */ ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import * as guards from './utils/ast-type-guards';
+import { serializeNodeScope } from './utils/scope';
 
 type MessageIds = 'uppercase' | 'lowercase' | 'isBulkSuppressed';
 
 type Options = [];
-
-type BulkSuppression = {
-  file: string;
-  scope: string;
-  rule: string;
-};
 
 function findEslintBulkSuppressionsJson(
   context: Readonly<TSESLint.RuleContext<MessageIds, Options>>
@@ -26,43 +21,10 @@ function findEslintBulkSuppressionsJson(
   return undefined;
 }
 
-// function manageScope(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): void {
-//   const code = context.getSourceCode().text;
-//   const ast = parse(code, { range: true });
-//   const scope = analyze(ast, { sourceType: 'module' });
-// }
-
-// function getScopeId(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): number | undefined {
-//   const scopeManager = context.getSourceCode().scopeManager;
-//   const deprecatedScope = context.getScope();
-//   scopeManager?.scopes.forEach((scope) => {
-//     console.log(scope);
-//   });
-//   return scopeManager?.currentScope?.$id;
-// }
-
-function serializeNodeScope(
-  context: Readonly<TSESLint.RuleContext<MessageIds, Options>>,
-  node: TSESTree.Node
-): BulkSuppression {
-  const scopeManager = context.getSourceCode().scopeManager;
-  if (!scopeManager) throw new Error('scopeManager is null');
-
-  const scopes = scopeManager.nodeToScope.get(node);
-  console.log(scopes);
-
-  return {
-    file: context.getFilename(),
-    scope: '',
-    rule: context.id
-  };
-}
-
 const isBulkSuppressedRule: TSESLint.RuleModule<MessageIds, Options> = {
   create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
     return {
       FunctionDeclaration(node) {
-        console.log('hello');
         if (node.id != null) {
           if (/^[a-z]/.test(node.id.name)) {
             context.report({

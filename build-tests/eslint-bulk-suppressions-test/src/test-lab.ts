@@ -1,6 +1,5 @@
-// /* Top-level scope code samples */
-// // scope: '.', target: '.'
-// let exampleString: string = 5 + '';
+// Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+// See LICENSE in the project root for license information.
 
 // const exampleObject = {
 //   exampleString: exampleString
@@ -72,22 +71,32 @@
 //   }
 // };
 
-// /* Absurd examples */
-// export class AbsurdClass {
-//   absurdClassMethod() {
-//     return class AbsurdClass2 {
-//       absurdClassProperty;
-//       constructor() {
-//         const absurdObject = {
-//           // scope: '.ClassDeclaration.MethodDefinition.ClassExpression.MethodDefinition.VariableDeclarator.Property'
-//           // target: '.AbsurdClass.absurdClassMethod.AbsurdClass2.constructor.absurdObject.absurdObjectMethod'
-//           absurdObjectMethod() {}
-//         };
-//         this.absurdClassProperty = absurdObject;
-//       }
-//     };
-//   }
-// }
+/* Absurd examples */
+export class AbsurdClass {
+  public absurdClassMethod(): unknown {
+    function AbsurdFunctionExpression(): unknown {
+      return class AbsurdClass2 {
+        public absurdClassProperty: {
+          // scope: '.ClassDeclaration.MethodDefinition.ClassExpression.MethodDefinition.VariableDeclarator.Property'
+          // target: '.AbsurdClass.absurdClassMethod.AbsurdClass2.constructor.absurdObject.absurdObjectMethod'
+          absurdObjectMethod(): void;
+        };
+        public constructor() {
+          const absurdObject: { absurdObjectMethod(): void } = {
+            // scope: '.ClassDeclaration.MethodDefinition.ClassExpression.MethodDefinition.VariableDeclarator.Property'
+            // target: '.AbsurdClass.absurdClassMethod.AbsurdClass2.constructor.absurdObject.absurdObjectMethod'
+            absurdObjectMethod() {
+              function absurdFunctionExpression2(): void {}
+              return absurdFunctionExpression2;
+            }
+          };
+          this.absurdClassProperty = absurdObject;
+        }
+      };
+    }
+    return AbsurdFunctionExpression;
+  }
+}
 
 // /* Type, interface, enum code samples */
 // export type ExampleObjectType = {
@@ -115,6 +124,6 @@
 //   export interface ExampleInterface2 {}
 // }
 
-function lowerCase(str: string): string {
-  return str.toLowerCase();
-}
+// function lowerCase(str: string): string {
+//   return str.toLowerCase();
+// }

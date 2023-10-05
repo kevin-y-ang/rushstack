@@ -11,6 +11,9 @@ module.exports = {
     'local-node-rig/profiles/default/includes/eslint/profile/node-trusted-tool',
     'local-node-rig/profiles/default/includes/eslint/mixins/friendly-locals'
   ],
+  rules: {
+    '@rushstack/is-bulk-suppressed': 'error'
+  },
   parserOptions: { tsconfigRootDir: __dirname },
 
   overrides: [
