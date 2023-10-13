@@ -2,10 +2,14 @@ import { Scope, ScopeType } from '@typescript-eslint/scope-manager';
 import { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import * as guards from './ast-type-guards';
 
-type BulkSuppression = {
+export type BulkSuppression = {
   file: string;
-  scope: string;
+  scopeId: string;
   rule: string;
+};
+
+export type BulkSuppressionsJson = {
+  suppressions: BulkSuppression[];
 };
 
 function getNodeName(node: TSESTree.Node): string | null {
@@ -24,6 +28,8 @@ function getNodeName(node: TSESTree.Node): string | null {
   if (guards.isNormalObjectPropertyWithAnonymousExpressionAssigned(node)) return node.key.name;
 
   if (guards.isNormalClassPropertyDefinitionWithAnonymousExpressionAssigned(node)) return node.key.name;
+
+  if (guards.isNormalAssignmentPatternWithAnonymousExpressionAssigned(node)) return node.left.name;
 
   if (guards.isNormalMethodDefinition(node)) return node.key.name;
 
@@ -45,7 +51,7 @@ function getScopeAncestry(scope: Scope | null): Scope[] {
 export function serializeNodeScope<TMessageIds extends string, TOptions extends readonly unknown[]>(
   context: Readonly<TSESLint.RuleContext<TMessageIds, TOptions>>,
   node: TSESTree.Node
-): BulkSuppression {
+): string {
   const scopeManager = context.getSourceCode().scopeManager;
   if (!scopeManager) throw new Error('scopeManager is null');
 
@@ -56,9 +62,5 @@ export function serializeNodeScope<TMessageIds extends string, TOptions extends 
 
   // console.log('scopeAncestryNames', scopeAncestryNames);
 
-  return {
-    file: context.getFilename(),
-    scope: '.' + scopeAncestryNames.join('.'),
-    rule: context.id
-  };
+  return '.' + scopeAncestryNames.join('.');
 }

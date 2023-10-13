@@ -38,7 +38,7 @@ ruleTester.run('no-untyped-underscore', noUntypedUnderscoreRule, {
     {
       // prettier-ignore
       code: [
-        'let x: { _privateMember: any };',
+        'let x: any;',
         'x._privateMember = 123;'
       ].join('\n')
     },

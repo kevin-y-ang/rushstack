@@ -153,6 +153,14 @@ export function isNormalAnonymousExpression(node: TSESTree.Node): node is Normal
   return ANONYMOUS_EXPRESSION_GUARDS.some((guard) => guard(node));
 }
 
+export interface NormalAssignmentPattern extends TSESTree.AssignmentPattern {
+  left: TSESTree.Identifier;
+}
+
+export function isNormalAssignmentPattern(node: TSESTree.Node): node is NormalAssignmentPattern {
+  return isAssignmentPattern(node) && isIdentifier(node.left);
+}
+
 export interface NormalClassPropertyDefinition extends TSESTree.PropertyDefinitionNonComputedName {
   key: TSESTree.PrivateIdentifier | TSESTree.Identifier;
   value: TSESTree.Expression;
@@ -189,6 +197,16 @@ export interface NormalVariableDeclarator extends TSESTree.VariableDeclarator {
 
 export function isNormalVariableDeclarator(node: TSESTree.Node): node is NormalVariableDeclarator {
   return isVariableDeclarator(node) && isIdentifier(node.id) && node.init !== null;
+}
+
+export interface NormalAssignmentPatternWithAnonymousExpressionAssigned extends NormalAssignmentPattern {
+  right: NormalAnonymousExpression;
+}
+
+export function isNormalAssignmentPatternWithAnonymousExpressionAssigned(
+  node: TSESTree.Node
+): node is NormalAssignmentPatternWithAnonymousExpressionAssigned {
+  return isNormalAssignmentPattern(node) && isNormalAnonymousExpression(node.right);
 }
 
 export interface NormalVariableDeclaratorWithAnonymousExpressionAssigned extends NormalVariableDeclarator {
@@ -230,6 +248,7 @@ export type NodeWithName =
   | NormalVariableDeclaratorWithAnonymousExpressionAssigned
   | NormalObjectPropertyWithAnonymousExpressionAssigned
   | NormalClassPropertyDefinitionWithAnonymousExpressionAssigned
+  | NormalAssignmentPatternWithAnonymousExpressionAssigned
   | NormalMethodDefinition
   | TSESTree.TSEnumDeclaration
   | TSESTree.TSInterfaceDeclaration
@@ -244,6 +263,7 @@ export function isNodeWithName(node: TSESTree.Node): node is NodeWithName {
     isNormalVariableDeclaratorWithAnonymousExpressionAssigned(node) ||
     isNormalObjectPropertyWithAnonymousExpressionAssigned(node) ||
     isNormalClassPropertyDefinitionWithAnonymousExpressionAssigned(node) ||
+    isNormalAssignmentPatternWithAnonymousExpressionAssigned(node) ||
     isNormalMethodDefinition(node) ||
     isTSEnumDeclaration(node) ||
     isTSInterfaceDeclaration(node) ||
